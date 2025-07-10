@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "1.0",
+  "environments": {
+    "dev": {
+      "EnvironmentName": "dev",
+      "ResourceGroupName": "rg-vince-analytics-containerapp-dev",
+      "DeploymentStackName": "azbootstrap-stack-dev-20250708192407",
+      "PlanGitHubEnvironmentName": "dev-iac-plan",
+      "ApplyGitHubEnvironmentName": "dev-iac-apply",
+      "TerraformStateStorageAccountName": "stvinceanalyticscontaine",
+      "Timestamp": "2025-07-08T19:26:20.1941757+12:00"
+    }
+  }
+}

@@ -1,3 +1,3 @@
-output "resource_group_name" {
-  value = local.resource_group_name
+output "vince_url" {
+  value = "https://${local.container_vince_app.azure_name}.${var.short_location_code}.azurecontainerapps.io"
 }
