@@ -10,8 +10,10 @@ module "storage_account" {
   account_tier             = "Standard"
 
   network_rules = {
-    bypass         = ["AzureServices"]
-    default_action = "Deny"
+    bypass = ["AzureServices"]
+    # Allow public network access so Container Apps can mount Azure File shares.
+    # For production, consider using private endpoints or explicit vnet rules instead.
+    default_action = "Allow"
   }
   public_network_access_enabled = true
 

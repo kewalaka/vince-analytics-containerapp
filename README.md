@@ -56,3 +56,20 @@ Key Vince environment variables are configured automatically:
 - `VINCE_URL`: Auto-generated based on Container App FQDN
 - `VINCE_ADMIN_NAME`: From Key Vault
 - `VINCE_ADMIN_PASSWORD`: From Key Vault
+
+## Testing locally
+
+```sh
+# create a local data dir for testing
+mkdir -p ./local-data
+
+# run the container (adjust VINCE_ADMIN_PASSWORD to a test value)
+docker run --rm \
+  -e VINCE_LISTEN=":8080" \
+  -e VINCE_DATA="/data" \
+  -e VINCE_ADMIN_NAME="vince@admin.local" \
+  -e VINCE_ADMIN_PASSWORD="test-pass" \
+  -p 8080:8080 \
+  -v "$(pwd)/local-data:/data" \
+  ghcr.io/vinceanalytics/vince:v1.11.8 serve
+```

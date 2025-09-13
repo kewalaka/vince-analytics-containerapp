@@ -1,3 +1,3 @@
 output "vince_url" {
-  value = "https://${local.container_vince_app.azure_name}.${var.short_location_code}.azurecontainerapps.io"
+  value = "https://${local.container_vince_app.azure_name}.${module.container_app_environment.default_domain}"
 }

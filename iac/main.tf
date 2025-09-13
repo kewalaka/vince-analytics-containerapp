@@ -45,7 +45,9 @@ module "container_app_environment" {
 module "container_apps" {
   for_each = local.container_definitions
 
-  source = "git::https://github.com/kewalaka/terraform-azurerm-avm-res-app-containerapp?ref=feat/main-fixes"
+  #source = "git::https://github.com/kewalaka/terraform-azurerm-avm-res-app-containerapp?ref=feat/main-fixes"
+  source  = "Azure/avm-res-app-containerapp/azurerm"
+  version = "0.7.4"
 
   container_app_environment_resource_id = module.container_app_environment.id
   name                                  = each.value.azure_name
@@ -130,5 +132,5 @@ resource "azurerm_role_assignment" "container_app_keyvault_access" {
 
   scope                = module.keyvault.resource_id
   role_definition_name = "Key Vault Secrets User"
-  principal_id         = module.container_apps[each.key].identity.principalId
+  principal_id         = module.container_apps[each.key].identity[0].principal_id
 }

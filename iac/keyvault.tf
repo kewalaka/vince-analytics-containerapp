@@ -33,6 +33,6 @@ module "keyvault" {
 resource "azurerm_key_vault_secret" "vince_admin_password" {
   name             = "vince-admin-password"
   value_wo         = ephemeral.random_password.vince_admin_password.result
-  value_wo_version = 1
+  value_wo_version = 3
   key_vault_id     = module.keyvault.resource_id
 }
