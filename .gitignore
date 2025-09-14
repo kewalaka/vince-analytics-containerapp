@@ -1,2 +1,15 @@
 secrets.*
 .env
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+*.tfplan
+
+# Azure Developer CLI
+.azure/*/config.json
+.azure/*/.env
+.azure/*/terraform.tfstate*
