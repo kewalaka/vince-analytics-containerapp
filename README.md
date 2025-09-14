@@ -1,24 +1,75 @@
-# Base Terraform Solution Template
+# Vince Analytics on Azure Container Apps
 
-A streamlined Terraform template for quickly provisioning Azure resources with GitHub-integrated deployments.
+This Terraform configuration deploys [Vince Analytics](https://www.vinceanalytics.com/) on Azure Container Apps. Vince is a privacy-focused, self-hosted web analytics solution that's simpler and lighter than alternatives like Plausible Analytics (on which it is based) and Matomo.
 
-## Getting Started
+## Architecture
 
-This is designed to be used with [Az-Bootstrap](https://github.com/kewalaka/az-bootstrap)
+- **Azure Container Apps**: Hosts the Vince analytics application
+- **Azure File Storage**: Persistent storage for Vince data
+- **Azure Key Vault**: Stores admin credentials securely
+- **Init Container**: Creates the admin user before the main application starts
 
-Az-Bootstrap will create the deployment resource group, storage account for state, plan & apply identities.
+## Key Features
 
-To make the sample code work
+- Single container deployment (no database required)
+- Automatic admin user creation via init container
+- Persistent data storage using Azure Files
+- Secure credential management with Key Vault
+- Auto-scaling with Container Apps
 
-1) Update the `app_name` in locals.tf to match the name of the repository.
+## Deployment
 
-1) Add the name of your CI runner to `.github\workflow\terraform-deploy.yml`
+1. Ensure you have a resource group created
+2. Update `environments/dev.terraform.tfvars` with your desired values
+3. Deploy:
 
-You should then be able to run the `Deploy Iac using Terraform` action on GitHub.
+```bash
+cd iac
+terraform init
+terraform plan -var-file="environments/dev.terraform.tfvars"
+terraform apply -var-file="environments/dev.terraform.tfvars"
+```
 
-### Alternatives to using runners
+## Configuration
 
-If you don't have any GitHub runners available, or don't want to use them, you can either:
+The application is configured with:
 
-- switch the Terraform Storage Account to allow public networking (check [.azbootstrap.jsonc](.azbootstrap.jsonc) for the details of the storage account)
-- use the `unlock_resource_firewalls` action to dynamically unlock the firewall during CI runs - check the [README.md](https://github.com/kewalaka/github-azure-iac-templates/blob/main/.github/actions/azure-unlock-firewall/README.md) for details.
+- Data stored in `/data` directory (mapped to Azure File share)
+- Admin user created automatically on first deployment
+- External access enabled on port 8080
+- Default URL pattern: `https://ca-vince-app-{env}.{location}.azurecontainerapps.io`
+
+## Admin Access
+
+After deployment, you can access the Vince interface using:
+
+- **URL**: Output from `vince_url`
+- **Username**: `admin@vince.local`
+- **Password**: Retrieved from Key Vault (secret: `vince-admin-password`)
+
+## Environment Variables
+
+Key Vince environment variables are configured automatically:
+
+- `VINCE_LISTEN`: `:8080`
+- `VINCE_DATA`: `/data`
+- `VINCE_URL`: Auto-generated based on Container App FQDN
+- `VINCE_ADMIN_NAME`: From Key Vault
+- `VINCE_ADMIN_PASSWORD`: From Key Vault
+
+## Testing locally
+
+```sh
+# create a local data dir for testing
+mkdir -p ./local-data
+
+# run the container (adjust VINCE_ADMIN_PASSWORD to a test value)
+docker run --rm \
+  -e VINCE_LISTEN=":8080" \
+  -e VINCE_DATA="/data" \
+  -e VINCE_ADMIN_NAME="vince@admin.local" \
+  -e VINCE_ADMIN_PASSWORD="test-pass" \
+  -p 8080:8080 \
+  -v "$(pwd)/local-data:/data" \
+  ghcr.io/vinceanalytics/vince:v1.11.8 serve
+```
