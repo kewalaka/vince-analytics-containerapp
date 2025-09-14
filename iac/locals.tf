@@ -14,10 +14,6 @@ locals {
   container_app_environment_name = "cae-${local.default_suffix}"
   log_analytics_workspace_name   = "law-${local.default_suffix}"
 
-  # tflint-ignore: terraform_unused_declarations
-  location = data.azurerm_resource_group.this.location
-
-  # tflint-ignore: terraform_unused_declarations
   default_tags = merge(
     var.default_tags,
     tomap({
@@ -38,5 +34,20 @@ locals {
 
   container_definitions = {
     app = local.container_vince_app
+  }
+
+  # Derive storage definitions from all container definitions
+  storage_definitions = {
+    for storage_name in distinct(flatten([
+      for container_key, container in local.container_definitions : [
+        for volume in try(container.volumes, []) :
+        volume.storage_name if volume.storage_type == "AzureFile"
+      ]
+      ])) : storage_name => {
+      account_name = module.storage_account.name
+      share_name   = storage_name
+      access_key   = module.storage_account.resource.primary_access_key
+      access_mode  = "ReadWrite"
+    }
   }
 }

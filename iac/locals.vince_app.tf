@@ -29,14 +29,7 @@ locals {
         storage_name = "vince-data"
       }
     ]
-    required_secrets = ["vince_admin_password"]
-    args             = ["serve"]
-    ports = [
-      {
-        port      = 8080
-        transport = "http"
-      }
-    ]
+    args = ["serve"]
     ingress = {
       target_port      = 8080
       external_enabled = true

@@ -1,6 +1,5 @@
 data "azurerm_client_config" "current" {}
 
-# Get info about the resource group the solution is deployed into
 data "azurerm_resource_group" "this" {
   name = local.resource_group_name
 }
@@ -17,7 +16,6 @@ resource "azurerm_log_analytics_workspace" "this" {
 }
 
 module "container_app_environment" {
-  #source = "git::https://github.com/Azure/terraform-azurerm-avm-res-app-managedenvironment?ref=0.3"
   source  = "Azure/avm-res-app-managedenvironment/azurerm"
   version = "0.3.0"
 
@@ -27,14 +25,7 @@ module "container_app_environment" {
 
   log_analytics_workspace = { resource_id = azurerm_log_analytics_workspace.this.id }
 
-  storages = {
-    "vince-data" = {
-      account_name = module.storage_account.name
-      share_name   = "vince-data"
-      access_key   = module.storage_account.resource.primary_access_key
-      access_mode  = "ReadWrite"
-    }
-  }
+  storages = local.storage_definitions
 
   tags = local.default_tags
 
@@ -45,7 +36,6 @@ module "container_app_environment" {
 module "container_apps" {
   for_each = local.container_definitions
 
-  #source = "git::https://github.com/kewalaka/terraform-azurerm-avm-res-app-containerapp?ref=feat/main-fixes"
   source  = "Azure/avm-res-app-containerapp/azurerm"
   version = "0.7.4"
 
@@ -106,7 +96,6 @@ module "container_apps" {
     min_replicas = try(each.value.min_replicas, 0)
     max_replicas = try(each.value.max_replicas, 10)
 
-    # Use the explicit volumes defined for each container
     volumes = each.value.volumes
   }
 
@@ -116,14 +105,14 @@ module "container_apps" {
     system_assigned = true
   }
 
-  # Only include secrets that this container actually needs
+  # Only include secrets that this container actually needs - derive from secrets block
   secrets = {
-    for secret_key in each.value.required_secrets :
-    secret_key => local.secret_definitions[secret_key]
+    for secret_key, secret_def in local.secret_definitions :
+    secret_key => secret_def
+    if contains([for secret_name in values(each.value.secrets) : secret_name], secret_def.name)
   }
 
   tags = local.default_tags
-
 }
 
 # Grant each Container App access to Key Vault
