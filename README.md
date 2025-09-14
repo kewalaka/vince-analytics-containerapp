@@ -19,6 +19,22 @@ This Terraform configuration deploys [Vince Analytics](https://www.vinceanalytic
 
 ## Deployment
 
+### Option 1: Azure Developer CLI (Recommended)
+
+The quickest way to deploy is using [Azure Developer CLI (azd)](https://learn.microsoft.com/en-us/azure/developer/azure-developer-cli/):
+
+```bash
+# Initialize and configure environment (first time only)
+azd init
+
+# Deploy infrastructure and application
+azd up
+```
+
+See [AZD.md](AZD.md) for detailed instructions and configuration options.
+
+### Option 2: Direct Terraform
+
 1. Ensure you have a resource group created
 2. Update `environments/dev.terraform.tfvars` with your desired values
 3. Deploy:

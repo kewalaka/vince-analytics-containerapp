@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
+
+name: vince-analytics-containerapp
+metadata:
+  template: vince-analytics-containerapp@0.0.1-beta
+summary: Self-hosted web analytics with Vince on Azure Container Apps
+description: Deploy Vince Analytics, a privacy-focused web analytics solution, on Azure Container Apps with persistent storage and automated admin user creation.
+author: kewalaka
+repositoryPath: .
+
+workflows:
+  up:
+    steps:
+      - azd: provision
+      - azd: deploy
+
+services:
+  web:
+    project: .
+    host: containerapp
+    language: other
+
+infra:
+  provider: terraform
+  path: iac
+
+pipeline:
+  provider: github-actions

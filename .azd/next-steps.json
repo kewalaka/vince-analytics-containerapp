@@ -1,0 +1,40 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/next-steps.json",
+  "title": "Vince Analytics Deployment Complete",
+  "description": "Your Vince Analytics instance has been successfully deployed to Azure Container Apps.",
+  "steps": [
+    {
+      "title": "Access your Vince Analytics dashboard",
+      "description": "Open your Vince Analytics application in the browser",
+      "actions": [
+        {
+          "text": "Open Application",
+          "type": "openUrl",
+          "url": "${SERVICE_WEB_ENDPOINT_URL}"
+        }
+      ]
+    },
+    {
+      "title": "Retrieve admin credentials",
+      "description": "Get the admin password from Azure Key Vault",
+      "actions": [
+        {
+          "text": "Get Password",
+          "type": "azureCli",
+          "command": "az keyvault secret show --name vince-admin-password --vault-name ${AZURE_KEY_VAULT_NAME} --query value -o tsv"
+        }
+      ]
+    },
+    {
+      "title": "Monitor your deployment",
+      "description": "View logs and metrics for your Container App",
+      "actions": [
+        {
+          "text": "View in Portal",
+          "type": "openUrl", 
+          "url": "https://portal.azure.com/#@${AZURE_TENANT_ID}/resource/subscriptions/${AZURE_SUBSCRIPTION_ID}/resourceGroups/${AZURE_RESOURCE_GROUP}/providers/Microsoft.App/containerApps/${AZURE_CONTAINER_APP_NAME}"
+        }
+      ]
+    }
+  ]
+}
